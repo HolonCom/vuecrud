@@ -2,14 +2,7 @@
 
 var data = [
     {
-        userName: "jannesiera",
-        emailAddress: "janne.siera@gmail.com",
-        isActive: false,
-        fullName: "Janne Siera",
-        //customActions: ["oa-user-custom-component"]
-    },
-    {
-        userName: "mickey",
+        userName: "mickey1",
         emailAddress: "mickey.mouse@cheesebox.com",
         isActive: true,
         fullName: "Mickey Garcia Mouse",
@@ -164,7 +157,6 @@ abp.auth = {
         CanActivate :false
     }
 };
-
 
 abp.localization = {
     currentCulture: {
@@ -343,22 +335,33 @@ abp.schemas.app.user.create.returnValue = {
         "emailAddress"
     ],
     "properties": {
+        "id": {
+            "type": "integer",
+            "format": "int64"
+        },
         "userName": {
             "type": "string",
-            "maxLength": 32,
+            "maxLength": 256,
             "minLength": 0,
             "x-ui-grid-sortable": true,
             "x-ui-card": 'User'
         },
-        "name": {
+        "title": {
             "type": "string",
-            "maxLength": 32,
+            "maxLength": 256,
+            "minLength": 0,
+            "x-ui-grid": false
+        },
+        "name": {
+            "title": "Firstname",
+            "type": "string",
+            "maxLength": 64,
             "minLength": 0,
             "x-ui-grid": false
         },
         "surname": {
             "type": "string",
-            "maxLength": 32,
+            "maxLength": 64,
             "minLength": 0,
             "x-ui-grid": false
         },
@@ -366,14 +369,23 @@ abp.schemas.app.user.create.returnValue = {
             "type": "string",
             "format": "email",
             "maxLength": 256,
-            "minLength": 0
+            "minLength": 0,
+            "x-ui-grid-sortable": true
+        },
+        "phoneNumber": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 0,
+            "x-ui-grid": false
         },
         "isActive": {
-            "type": "boolean"
+            "type": "boolean",
+            "x-ui-grid-sortable": true
         },
         "fullName": {
             "type": "string",
-            "readonly": true
+            "readonly": true,
+            "x-ui-grid-sortable": true
         },
         "lastLoginTime": {
             "type": "string",
@@ -394,13 +406,23 @@ abp.schemas.app.user.create.returnValue = {
             },
             "x-ui-grid": false
         },
+        "tenantId": {
+            "type": "integer",
+            "readonly": true,
+            "format": "int32",
+            "x-ui-grid": false
+        },
         "canDelete": {
             "type": "boolean",
             "x-ui-grid": false
         },
-        "id": {
-            "type": "integer",
-            "format": "int64"
+        "customActions": {
+            "type": "array",
+            "readonly": true,
+            "items": {
+                "type": "string"
+            },
+            "x-ui-grid": false
         }
     }
 }
@@ -419,29 +441,39 @@ abp.schemas.app.user.create.parameters = {
         "properties": {
             "userName": {
                 "type": "string",
-                "maxLength": 32,
+                "maxLength": 256,
+                "minLength": 0
+            },
+            "title": {
+                "type": "string",
+                "maxLength": 256,
                 "minLength": 0,
-                "x-ui-grid-sortable": true,
-                "x-ui-card": 'User'
+                "x-ui-grid": false
             },
             "name": {
+                "title": "Firstname",
                 "type": "string",
-                "maxLength": 32,
+                "maxLength": 64,
                 "minLength": 0
             },
             "surname": {
                 "type": "string",
-                "maxLength": 32,
+                "maxLength": 64,
                 "minLength": 0
             },
             "emailAddress": {
                 "type": "string",
                 "format": "email",
                 "maxLength": 256,
+                "minLength": 0
+            },
+            "phoneNumber": {
+                "type": "string",
+                "maxLength": 32,
                 "minLength": 0,
                 "x-ui-dependency-field": 'isActive',
-                "x-ui-dependency-value": true
-    
+                "x-ui-dependency-value": true,
+                "x-ui-grid": false
             },
             "isActive": {
                 "type": "boolean"
@@ -525,21 +557,32 @@ abp.schemas.app.user.update.returnValue = {
         "emailAddress"
     ],
     "properties": {
+        "id": {
+            "type": "integer",
+            "format": "int64"
+        },
         "userName": {
             "type": "string",
             "maxLength": 32,
             "minLength": 0,
             "x-ui-grid-sortable": true
         },
-        "name": {
+        "title": {
             "type": "string",
-            "maxLength": 32,
+            "maxLength": 256,
+            "minLength": 0,
+            "x-ui-grid": false
+        },
+        "name": {
+            "title": "Firstname",
+            "type": "string",
+            "maxLength": 64,
             "minLength": 0,
             "x-ui-grid": false
         },
         "surname": {
             "type": "string",
-            "maxLength": 32,
+            "maxLength": 64,
             "minLength": 0,
             "x-ui-grid": false
         },
@@ -547,14 +590,23 @@ abp.schemas.app.user.update.returnValue = {
             "type": "string",
             "format": "email",
             "maxLength": 256,
-            "minLength": 0
+            "minLength": 0,
+            "x-ui-grid-sortable": true
+        },
+        "phoneNumber": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 0,
+            "x-ui-grid": false
         },
         "isActive": {
-            "type": "boolean"
+            "type": "boolean",
+            "x-ui-grid-sortable": true
         },
         "fullName": {
             "type": "string",
-            "readonly": true
+            "readonly": true,
+            "x-ui-grid-sortable": true
         },
         "lastLoginTime": {
             "type": "string",
@@ -575,13 +627,23 @@ abp.schemas.app.user.update.returnValue = {
             },
             "x-ui-grid": false
         },
+        "tenantId": {
+            "type": "integer",
+            "readonly": true,
+            "format": "int32",
+            "x-ui-grid": false
+        },
         "canDelete": {
             "type": "boolean",
             "x-ui-grid": false
         },
-        "id": {
-            "type": "integer",
-            "format": "int64"
+        "customActions": {
+            "type": "array",
+            "readonly": true,
+            "items": {
+                "type": "string"
+            },
+            "x-ui-grid": false
         }
     }
 }
@@ -597,20 +659,30 @@ abp.schemas.app.user.update.parameters = {
             "emailAddress"
         ],
         "properties": {
+            "id": {
+                "type": "integer",
+                "format": "int64"
+            },
             "userName": {
                 "type": "string",
-                "maxLength": 32,
+                "maxLength": 256,
+                "minLength": 0
+            },
+            "title": {
+                "type": "string",
+                "maxLength": 256,
                 "minLength": 0,
-                "x-ui-grid-sortable": true
+                "x-ui-grid": false
             },
             "name": {
+                "title": "Firstname",
                 "type": "string",
-                "maxLength": 32,
+                "maxLength": 64,
                 "minLength": 0
             },
             "surname": {
                 "type": "string",
-                "maxLength": 32,
+                "maxLength": 64,
                 "minLength": 0
             },
             "emailAddress": {
@@ -618,6 +690,12 @@ abp.schemas.app.user.update.parameters = {
                 "format": "email",
                 "maxLength": 256,
                 "minLength": 0
+            },
+            "phoneNumber": {
+                "type": "string",
+                "maxLength": 32,
+                "minLength": 0,
+                "x-ui-grid": false
             },
             "isActive": {
                 "type": "boolean"
@@ -628,7 +706,7 @@ abp.schemas.app.user.update.parameters = {
                 "items": {
                     "type": "string"
                 },
-                //"x-enum-action": "getRoles",
+                "x-enum-action": "getRoles",
                 "x-enum-valuefield": "normalizedName",
                 "x-enum-textfield": "displayName"
             },
@@ -636,10 +714,6 @@ abp.schemas.app.user.update.parameters = {
                 "type": "string",
                 "maxLength": 32,
                 "minLength": 0
-            },
-            "id": {
-                "type": "integer",
-                "format": "int64"
             }
         }
     },
@@ -659,7 +733,84 @@ abp.schemas.app.user.delete.parameters = {
         }
     },
 };
-
+// action 'getRoles'
+abp.schemas.app.user.getRoles = abp.schemas.app.user.getRoles || {};
+abp.schemas.app.user.getRoles.returnValue = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "ListResultDtoOfRoleDto",
+    "type": "object",
+    "properties": {
+        "items": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "displayName"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "name": {
+                        "title": "RoleName",
+                        "type": "string",
+                        "maxLength": 32,
+                        "minLength": 0,
+                        "x-ui-grid": true
+                    },
+                    "displayName": {
+                        "title": "DisplayName",
+                        "type": "string",
+                        "maxLength": 64,
+                        "minLength": 0,
+                        "x-ui-grid": true
+                    },
+                    "normalizedName": {
+                        "type": "string",
+                        "x-ui-grid": false
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 5000,
+                        "minLength": 0,
+                        "x-ui-grid": false
+                    },
+                    "isStatic": {
+                        "type": "boolean",
+                        "x-ui-grid": false
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-ui-grid": false
+                    }
+                }
+            }
+        }
+    }
+}
+// action 'changeLanguage'
+abp.schemas.app.user.changeLanguage = abp.schemas.app.user.changeLanguage || {};
+abp.schemas.app.user.changeLanguage.parameters = {
+    input: {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "title": "ChangeUserLanguageDto",
+        "type": "object",
+        "required": [
+            "languageName"
+        ],
+        "properties": {
+            "languageName": {
+                "type": "string",
+                "minLength": 1
+            }
+        }
+    },
+};
 // action 'get'
 abp.schemas.app.user.get = abp.schemas.app.user.get || {};
 abp.schemas.app.user.get.returnValue = {
@@ -673,21 +824,32 @@ abp.schemas.app.user.get.returnValue = {
         "emailAddress"
     ],
     "properties": {
+        "id": {
+            "type": "integer",
+            "format": "int64"
+        },
         "userName": {
             "type": "string",
-            "maxLength": 32,
+            "maxLength": 256,
             "minLength": 0,
             "x-ui-grid-sortable": true
         },
-        "name": {
+        "title": {
             "type": "string",
-            "maxLength": 32,
+            "maxLength": 256,
+            "minLength": 0,
+            "x-ui-grid": false
+        },
+        "name": {
+            "title": "Firstname",
+            "type": "string",
+            "maxLength": 64,
             "minLength": 0,
             "x-ui-grid": false
         },
         "surname": {
             "type": "string",
-            "maxLength": 32,
+            "maxLength": 64,
             "minLength": 0,
             "x-ui-grid": false
         },
@@ -696,15 +858,22 @@ abp.schemas.app.user.get.returnValue = {
             "format": "email",
             "maxLength": 256,
             "minLength": 0,
-            "x-ui-dependency-field": 'isActive',
-            "x-ui-dependency-value": true
+            "x-ui-grid-sortable": true
+        },
+        "phoneNumber": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 0,
+            "x-ui-grid": false
         },
         "isActive": {
-            "type": "boolean"
+            "type": "boolean",
+            "x-ui-grid-sortable": true
         },
         "fullName": {
             "type": "string",
-            "readonly": true
+            "readonly": true,
+            "x-ui-grid-sortable": true
         },
         "lastLoginTime": {
             "type": "string",
@@ -725,13 +894,23 @@ abp.schemas.app.user.get.returnValue = {
             },
             "x-ui-grid": false
         },
+        "tenantId": {
+            "type": "integer",
+            "readonly": true,
+            "format": "int32",
+            "x-ui-grid": false
+        },
         "canDelete": {
             "type": "boolean",
             "x-ui-grid": false
         },
-        "id": {
-            "type": "integer",
-            "format": "int64"
+        "customActions": {
+            "type": "array",
+            "readonly": true,
+            "items": {
+                "type": "string"
+            },
+            "x-ui-grid": false
         }
     }
 }
@@ -755,10 +934,6 @@ abp.schemas.app.user.getAll.returnValue = {
     "title": "PagedResultDtoOfUserDto",
     "type": "object",
     "properties": {
-        "totalCount": {
-            "type": "integer",
-            "format": "int32"
-        },
         "items": {
             "type": "array",
             "items": {
@@ -770,21 +945,32 @@ abp.schemas.app.user.getAll.returnValue = {
                     "emailAddress"
                 ],
                 "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
                     "userName": {
                         "type": "string",
-                        "maxLength": 32,
+                        "maxLength": 256,
                         "minLength": 0,
                         "x-ui-grid-sortable": true
                     },
-                    "name": {
+                    "title": {
                         "type": "string",
-                        "maxLength": 32,
+                        "maxLength": 256,
+                        "minLength": 0,
+                        "x-ui-grid": false
+                    },
+                    "name": {
+                        "title": "Firstname",
+                        "type": "string",
+                        "maxLength": 64,
                         "minLength": 0,
                         "x-ui-grid": false
                     },
                     "surname": {
                         "type": "string",
-                        "maxLength": 32,
+                        "maxLength": 64,
                         "minLength": 0,
                         "x-ui-grid": false
                     },
@@ -793,16 +979,22 @@ abp.schemas.app.user.getAll.returnValue = {
                         "format": "email",
                         "maxLength": 256,
                         "minLength": 0,
-                        "x-ui-dependency-field": 'isActive',
-                        "x-ui-dependency-value": true
-            
+                        "x-ui-grid-sortable": true
+                    },
+                    "phoneNumber": {
+                        "type": "string",
+                        "maxLength": 32,
+                        "minLength": 0,
+                        "x-ui-grid": false
                     },
                     "isActive": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "x-ui-grid-sortable": true
                     },
                     "fullName": {
                         "type": "string",
-                        "readonly": true
+                        "readonly": true,
+                        "x-ui-grid-sortable": true
                     },
                     "lastLoginTime": {
                         "type": "string",
@@ -823,16 +1015,30 @@ abp.schemas.app.user.getAll.returnValue = {
                         },
                         "x-ui-grid": false
                     },
+                    "tenantId": {
+                        "type": "integer",
+                        "readonly": true,
+                        "format": "int32",
+                        "x-ui-grid": false
+                    },
                     "canDelete": {
                         "type": "boolean",
                         "x-ui-grid": false
                     },
-                    "id": {
-                        "type": "integer",
-                        "format": "int64"
+                    "customActions": {
+                        "type": "array",
+                        "readonly": true,
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-ui-grid": false
                     }
                 }
             }
+        },
+        "totalCount": {
+            "type": "integer",
+            "format": "int32"
         }
     }
 }
@@ -842,16 +1048,7 @@ abp.schemas.app.user.getAll.parameters = {
         "title": "UsersResultRequestDto",
         "type": "object",
         "properties": {
-            "search": {
-                "type": "string"
-            },
-            "userName": {
-                "type": "string",
-                "maxLength": 55,
-                "x-ui-filter-eager": true,
-                "x-ui-grid-sortable": true
-            },
-            "email": {
+            "sorting": {
                 "type": "string"
             },
             "skipCount": {
@@ -865,6 +1062,14 @@ abp.schemas.app.user.getAll.parameters = {
                 "format": "int32",
                 "maximum": 2147483647.0,
                 "minimum": 1.0
+            },
+            "userName": {
+                "type": "string",
+                "x-ui-filter-eager": true
+            },
+            "email": {
+                "type": "string",
+                "x-ui-filter-eager": true
             }
         }
     },
