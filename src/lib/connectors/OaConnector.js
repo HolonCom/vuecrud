@@ -1,3 +1,30 @@
+function capitalize(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function validateAction(appService, action)
+{
+    // determine AppService Method
+    var method = "";
+    if (action == 'create') 
+        method = 'create';
+    else if (action == 'update')
+        method = 'update';
+    else if (action == 'get')
+        method = 'get';
+    else if (action == 'filter')
+        method = 'getAll';
+
+    if(method === "")
+        return false;
+
+    // Check existance of the AppService Method
+    if (abp.schemas.app[appService][method] === undefined)
+        throw "Your '" + capitalize(appService) + "AppService' is missing an implementation for " + capitalize(method) + "().";
+    else
+        return true;
+}
+
 export default {
 
     /**
@@ -11,15 +38,22 @@ export default {
     schema(appService, action) {
         // eslint-disable-next-line
         const base = abp.schemas.app[appService];
+
+        // validate appService
+        if (abp.schemas.app[appService] === undefined)
+        {
+            throw "The specified '" + capitalize(appService) + "AppService' is missing.";
+        }
+
         let data = null;
-        if (action == 'create')
-            data = base.create.parameters.input;
-        else if (action == 'update')
-            data = base.update.parameters.input;
-        else if (action == 'get')
+        if (validateAction(appService, action) == 'create')
+            data = base.getcreateAll.parameters[Object.keys(base.getAll.parameters)[0]];
+        else if (validateAction(appService, action) == 'update')
+            data = base.update.parameters[Object.keys(base.getAll.parameters)[0]];
+        else if (validateAction(appService, action) == 'get')
             data = base.get.returnValue;
-        else if (action == 'filter')
-            data = base.getAll.parameters.input;
+        else if (validateAction(appService, action) == 'filter')
+            data = base.getAll.parameters[Object.keys(base.getAll.parameters)[0]];
 
         return data;
     },
@@ -115,5 +149,4 @@ export default {
             return;
         }
     }
-
 }
