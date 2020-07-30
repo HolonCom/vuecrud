@@ -47,9 +47,9 @@ export default {
 
         let data = null;
         if (validateAction(appService, action) == 'create')
-            data = base.create.parameters[Object.keys(base.getAll.parameters)[0]];
+            data = base.create.parameters[Object.keys(base.create.parameters)[0]];
         else if (validateAction(appService, action) == 'update')
-            data = base.update.parameters[Object.keys(base.getAll.parameters)[0]];
+            data = base.update.parameters[Object.keys(base.update.parameters)[0]];
         else if (validateAction(appService, action) == 'get')
             data = base.get.returnValue;
         else if (validateAction(appService, action) == 'filter')
