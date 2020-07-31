@@ -177,23 +177,21 @@ abp.setting = {
 }
 
 var demoajax = function(data)  {
-        this.lst = data;
-        this.then = (callback) => {
-            if (callback) callback(this.lst);
-            return this;
-        };
-        this.catch = () => {
-            
-            return this;
-        };
-        this.fail = () => {
-            
-            return this;
-        };
-        this.always= (callback) => {
-            if (callback) callback();
-            return this;
-        }
+    this.lst = data;
+    this.then = (callback) => {
+        if (callback) callback(this.lst);
+        return this;
+    };
+    this.catch = () => {
+        return this;
+    };
+    this.fail = () => {
+        return this;
+    };
+    this.always= (callback) => {
+        if (callback) callback();
+        return this;
+    }
 }
 
 /*************************************** services****************/
@@ -271,7 +269,7 @@ abp.services.app.user.get = function (input, ajaxParams) {
 // eslint-disable-next-line
 abp.services.app.user.getAll = function (input, ajaxParams) {
     const filterStringData = (dto, dtoProp, itemProp) => item => dto[dtoProp] === undefined || item[itemProp].includes(dto[dtoProp]);
-    console.log(input);
+    //console.log(input);
 
     const list = data
         .filter(filterStringData(input, 'userName', 'userName'))
