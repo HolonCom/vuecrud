@@ -1,5 +1,5 @@
 {
-    "name": "vuecrudLocal",
+    "name": "vuecrudlocal",
     "version": "0.2.134",
     "private": true,
     "main": "dist/vuecrud.umd.js",
