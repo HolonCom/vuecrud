@@ -36,15 +36,13 @@ export default {
          
          */
     schema(appService, action) {
-        // eslint-disable-next-line
-        const base = abp.schemas.app[appService];
-
         // validate appService
         if (abp.schemas.app[appService] === undefined)
         {
             throw "The specified '" + capitalize(appService) + "AppService' is missing.";
         }
 
+        const base = abp.schemas.app[appService];
         let data = null;
         if (validateAction(appService, action) == 'create')
             data = base.create.parameters[Object.keys(base.create.parameters)[0]];

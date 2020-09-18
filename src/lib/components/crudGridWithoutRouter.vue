@@ -294,7 +294,7 @@ export default {
       else return text;
     },
     getCustomActions(row, index) {
-      // as vue Components
+      // better name would have been getCustomComponents, vue Components
       if (row.customActions) {
         return row.customActions.map(type => {
           var compName = "oa-" + type;
