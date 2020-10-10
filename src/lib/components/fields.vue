@@ -13,22 +13,22 @@
             :xl="24/Object.keys(gvalue.columns).length"
           >
             <el-card v-for="(pvalue, pkey) in cvalue" :key="pkey" class="oa-fields-card">
-              <div slot="header" v-if="pkey != 'undefined'">
-                <span>{{pkey}}</span>
-              </div>
-              <oa-field
-                v-for="(value, key) in pvalue"
-                :key="key"
-                :prop="key"
-                :schema="properties[key]"
-                v-model="model[key]"
-                :messages="messages"
-                @propChange="propChange"
-                :connector="connector"
-                :resource="resource"
-                :parent-model="cascadeModel"
-              ></oa-field>
-            </el-card>
+                <div slot="header" v-if="pkey != 'undefined'">
+                  <span>{{pkey}}</span>
+                </div>
+                <oa-field
+                  v-for="(value, key) in pvalue"
+                  :key="key"
+                  :prop="key"
+                  :schema="properties[key]"
+                  v-model="model[key]"
+                  :messages="messages"
+                  @propChange="propChange"
+                  :connector="connector"
+                  :resource="resource"
+                  :parent-model="cascadeModel"
+                ></oa-field>
+              </el-card>
           </el-col>
         </el-row>
       </el-tab-pane>
@@ -44,24 +44,24 @@
         :xl="24/Object.keys(columns).length"
       >
         <el-card v-for="(pvalue, pkey) in cvalue" :key="pkey" class="oa-fields-card">
-          <div slot="header" v-if="pkey != 'undefined'">
-            <span>{{pkey}}</span>
-          </div>
+            <div slot="header" v-if="pkey != 'undefined'">
+              <span>{{pkey}}</span>
+            </div>
 
-          <oa-field
-            v-for="(value, key) in pvalue"
-            v-if="visible(value)"
-            :key="key"
-            :prop="key"
-            :schema="properties[key]"
-            v-model="model[key]"
-            :messages="messages"
-            @propChange="propChange"
-            :connector="connector"
-            :resource="resource"
-            :parent-model="cascadeModel"
-          ></oa-field>
-        </el-card>
+            <oa-field
+              v-for="(value, key) in pvalue"
+              v-if="visible(value)"
+              :key="key"
+              :prop="key"
+              :schema="properties[key]"
+              v-model="model[key]"
+              :messages="messages"
+              @propChange="propChange"
+              :connector="connector"
+              :resource="resource"
+              :parent-model="cascadeModel"
+            ></oa-field>
+          </el-card>
       </el-col>
     </el-row>
   </div>
