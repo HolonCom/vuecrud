@@ -7,6 +7,8 @@
     :connector="connector" 
     :resource="resource" 
     :messages="messages"
+    :language="language"
+    @changeLanguage="changeLanguage"
   ></oa-form>
 </template>
 
@@ -54,7 +56,8 @@ export default {
             //this.$router.go(-1); // go back
           }
         }
-      ]
+      ],
+      language: ""
     };
   },
   computed: {
@@ -79,21 +82,42 @@ export default {
     },
     connector: function() {
       return this.$root.$options.connector;
+    },
+    locale() {
+      return this.connector.locale();
+    },
+    isMultiLingual() {
+      return this.schema && this.schema["x-multi-language"];
     }
   },
   methods: {
+    changeLanguage(language) {
+      this.language = language;
+      this.fetchData();
+    },
     fetchData() {
       if (this.isnew) return;
-
-      this.connector
-        .pService(this.resource, "get", { id: this.id })
-        .then(data => (this.model = data));
+      if (this.isMultiLingual) {
+        this.connector
+          .pService(this.resource, "get", {
+            id: this.id,
+            language: this.language
+          })
+          .then(data => (this.model = data));
+      } else {
+        this.connector
+          .pService(this.resource, "get", { id: this.id })
+          .then(data => (this.model = data));
+      }
     },
     saveData(data) {
       if (this.isnew) return this.add(data);
       else return this.update(data);
     },
     add(data) {
+      if (this.isMultiLingual) {
+        data.language = this.language;  
+      }
       return this.connector.pService(this.resource, "create", data);
     },
     update(data) {
@@ -102,6 +126,7 @@ export default {
     }
   },
   created() {
+    this.language = this.locale;
     this.fetchData();
   }
 };
