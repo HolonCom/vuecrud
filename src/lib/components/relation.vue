@@ -1,6 +1,15 @@
 <template>
   <div>
+    <el-select v-if="relationSmall" v-model="model" :value-key="relationValueField" filterable >
+      <el-option
+        v-for="item in options"
+        :key="item.value.id"
+        :label="item.label"
+        :value="item.value"
+      ></el-option>
+    </el-select>
     <el-select
+      v-else
       v-model="model"
       :value-key="relationValueField"
       filterable
@@ -86,6 +95,9 @@ export default {
     relationCascade() {
       return this.schema["x-rel-cascade"];
     },
+    relationSmall() {
+      return this.schema["x-rel-small"];
+    },
     id() {
       return this.value ? this.value[this.relationValueField] : null;
     },
@@ -168,7 +180,7 @@ export default {
           );
         } else {
           this.connector.service(
-                        this.relationResource ? this.relationResource : this.resource,
+            this.relationResource ? this.relationResource : this.resource,
             this.relationAction,
             query,
             data => {
@@ -220,9 +232,49 @@ export default {
         // document.body.style.position = ''; // for ios cursor bug
         document.body.classList.remove("dialog-open");
       }
-        }
     },
+    generateOptions(newParentModel) {
+      let req = {};
+      if (newParentModel && newParentModel.model) {
+        req = Object.assign(req, this.parentModel.model);
+        if (this.parentModel.model) {
+          req.parent = this.parentModel.parent;
+        }
+      }
+      if (this.relationAction) {
+        this.connector.service(
+          this.resource,
+          this.relationAction,
+          req,
+          data => {
+            let items = data.items || data;
+            this.options = items.map(t => {
+              return {
+                label: t[this.relationTextField],
+                value: t
+              };
+            });
+          },
+          () => {}
+        );
+      }
+    }
+  },
   created() {
+    if (this.relationSmall) {
+      this.generateOptions(this.parentModel);
+      if (this.relationCascade) {
+        this.$watch(
+          "parentModel",
+          function(newVal) {
+            this.generateOptions(newVal);
+          },
+          {
+            deep: true
+          }
+        );
+      }
+    } else {
       if (this.value) {
         this.options = [
           {
@@ -232,5 +284,6 @@ export default {
         ];
       }
     }
+  }
 };
 </script>

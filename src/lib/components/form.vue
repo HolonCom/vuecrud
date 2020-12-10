@@ -31,7 +31,7 @@
       ref="form"
       :model="model"
       :rules="rules"
-      label-width="120px"
+      :label-width="labelWidthCalculated"
       :label-position="labelPosition"
     >
       <oa-fields
@@ -47,6 +47,8 @@
 
 <script>
 import { default as Utils } from "../utils/utils";
+import defaults from '../utils/defaults'
+
 export default {
   name: "oa-form",
   props: {
@@ -59,7 +61,8 @@ export default {
     connector: {},
     resource: String,
     customLabelPosition: String, // Optional,
-    language:String
+    language: String,
+    labelWidth: String
   },
   data() {
     return {};
@@ -100,7 +103,7 @@ export default {
         if (prop.required && prop.type != "object") {
           itemRules.push({
             required: true,
-            message: "Please input a value"
+            message: "Please input a value",
           });
           rules[key] = itemRules;
         }
@@ -119,7 +122,7 @@ export default {
           }
           itemRules.push({
             required: true,
-            message: "Please input a value"
+            message: "Please input a value",
           });
         }
       }
@@ -154,6 +157,9 @@ export default {
     },
     isMultiLingual() {
       return this.schema && this.schema["x-multi-language"];
+    },
+    labelWidthCalculated(){
+      return defaults.labelWidth;
     }
   },
   methods: {
@@ -176,8 +182,8 @@ export default {
       this.$set(this.model, key, value);
     },
     changeLanguage(language) {
-      this.$emit('changeLanguage', language);
-    }
-  }
+      this.$emit("changeLanguage", language);
+    },
+  },
 };
 </script>

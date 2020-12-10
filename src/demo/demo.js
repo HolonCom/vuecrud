@@ -340,6 +340,7 @@ abp.services.app.user.getRoles = function (ajaxParams) {
         items: [{ normalizedName: "admin", displayName: "admin" }],
         totalCount: data.length
     }
+    //res = [{ normalizedName: "admin", displayName: "admin" }];
     return new demoajax(res);
 
     // return abp.ajax($.extend(true, {
@@ -638,7 +639,11 @@ abp.schemas.app.user.update.parameters = {
             "surname": {
                 "type": "string",
                 "maxLength": 32,
-                "minLength": 0
+                "minLength": 0,
+                //"x-enum-cascade": true,
+                //"x-enum-action": "getRoles",
+                //"x-enum-valuefield": "normalizedName",
+                //"x-enum-textfield": "displayName"
             },
             "emailAddress": {
                 "type": "string",
