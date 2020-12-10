@@ -1,11 +1,11 @@
 <template>
-  <oa-form 
-    ref="form" 
-    :model="model" 
-    :schema="schema" 
-    :actions="actions" 
-    :connector="connector" 
-    :resource="resource" 
+  <oa-form
+    ref="form"
+    :model="model"
+    :schema="schema"
+    :actions="actions"
+    :connector="connector"
+    :resource="resource"
     :messages="messages"
     :language="language"
     @changeLanguage="changeLanguage"

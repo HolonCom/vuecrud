@@ -170,7 +170,6 @@ abp.auth = {
     }
 };
 
-
 abp.localization = {
     currentCulture: {
         name: 'fr'

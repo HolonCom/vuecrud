@@ -12,7 +12,13 @@
       </div>
     </template>
     <template #languages>
-      <el-select v-if="isMultiLingual" :value="language" placeholder="Language" @change="changeLanguage" size="small">
+      <el-select
+        v-if="isMultiLingual"
+        :value="language"
+        placeholder="Language"
+        @change="changeLanguage"
+        size="small"
+      >
         <el-option
           v-for="item in languages"
           :key="item.name"
@@ -56,8 +62,7 @@ export default {
     language:String
   },
   data() {
-    return {      
-    };
+    return {};
   },
   computed: {
     properties() {
@@ -147,13 +152,13 @@ export default {
     languages() {
       return this.connector.languages();
     },
-    isMultiLingual() {    
+    isMultiLingual() {
       return this.schema && this.schema["x-multi-language"];
     }
   },
   methods: {
     validate(callback) {
-      this.$refs.form.validate(function(valid) {
+      this.$refs.form.validate(function (valid) {
         if (callback) callback(valid);
       });
     },
@@ -170,7 +175,7 @@ export default {
     propChange(key, value) {
       this.$set(this.model, key, value);
     },
-    changeLanguage(language) {     
+    changeLanguage(language) {
       this.$emit('changeLanguage', language);
     }
   }
