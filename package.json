@@ -1,6 +1,6 @@
 {
     "name": "vuecrud",
-    "version": "0.2.148",
+    "version": "0.2.182",
     "private": true,
     "main": "dist/vuecrud.umd.js",
     "scripts": {
@@ -13,7 +13,7 @@
     },
     "dependencies": {
         "element-ui": "2.12.0",
-        "json-ref-lite": "^1.1.0",
+        "json-ref-lite": "1.1.0",
         "vue": "2.6.11",
         "vue-router": "3.3.4"
     },
@@ -34,10 +34,7 @@
             "plugin:vue/essential",
             "eslint:recommended"
         ],
-        "rules": {
-            "no-undef": "off",
-            "no-unused-vars": "off"
-        },
+        "rules": {},
         "parserOptions": {
             "parser": "babel-eslint"
         }

@@ -19,6 +19,7 @@
         :type="action.type"
         @click="action.execute()"
       >{{action.name}}</el-button>
+      <component v-for="(comp, index) in customBatchComponents" :key="index" :is="comp" ></component>
     </template>
     <template #filters>
       <div v-if="hasAdvFilter">
@@ -99,6 +100,7 @@ export default {
     module: String,
     resource: String,
     connector: Object,
+    entityType:{},
     doOnEdit: Function,
     doOnAdd: Function
   },
@@ -172,7 +174,7 @@ export default {
       };
       var action = this.connector.schema(this.resource, "filter").properties;
       for (var key in action) {
-        if (key != "skipCount" && key != "maxResultCount" && key != "sorting") {
+        if (key != "skipCount" && key != "maxResultCount" && key != "sorting" && key != "entityType") {
           schema.properties[key] = action[key];
         }
       }
@@ -251,6 +253,29 @@ export default {
     exportUrl() {
       let filterSchema = this.connector.schema(this.resource, "filter");
       return filterSchema && filterSchema["x-export-url"];
+    },
+    customBatchComponents() {
+      let filterSchema = this.connector.schema(this.resource, "filter");
+      let comps = filterSchema && filterSchema["x-ui-components"];
+      if (comps) {
+        return comps.split(',').map(type => {
+          var compName = "oa-" + type;
+          var comp = Vue.component(compName);
+          if (!comp) {
+            comp = (resolve, reject) => {
+              Utils.loadComponent({
+                name: compName,
+                path: this.connector.componentsPath() + type + ".js",
+                onLoad: resolve,
+                onError: reject
+              });
+            };
+          }
+          return comp;
+        });
+      } else {
+        return [];
+      }
     }
   },
   methods: {
@@ -274,6 +299,7 @@ export default {
       this.filterModel.sorting = sorting;
       this.filterModel.skipCount = (this.currentPage - 1) * this.pageSize;
       this.filterModel.maxResultCount = this.pageSize;
+      if (this.entityType)this.filterModel.entityType=this.entityType;
       const requestId = ++this.fetchDataId;
       return this.connector
         .pService(this.resource, "getAll", this.filterModel)

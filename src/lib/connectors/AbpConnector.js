@@ -1,60 +1,24 @@
-function capitalize(text) {
-    return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-function validateAction(appService, action)
-{
-    // determine AppService Method
-    var method = "";
-    if (action == 'create') 
-        method = 'create';
-    else if (action == 'update')
-        method = 'update';
-    else if (action == 'get')
-        method = 'get';
-    else if (action == 'filter')
-        method = 'getAll';
-
-    if(method === "")
-        return "";
-
-    // Check existance of the AppService Method
-    // eslint-disable-next-line no-undef
-    if (abp.schemas.app[appService][method] === undefined)
-        throw "Your '" + capitalize(appService) + "AppService' is missing an implementation for " + capitalize(method) + "().";
-    else
-        return action;
-}
-
 export default {
 
     /**
-         * Loads JSON schema 
-         *   from code created with Satrabel.OpenApp.ProxyScripting.JsonSchemaProxyScriptGenerator
+         * Loads JSON schema.
          *
          * @param {String} appService App service to be loaded
          * @param {String} action create | update | get | filter | [non-crud action]
          
          */
     schema(appService, action) {
-        // validate appService
-        // eslint-disable-next-line no-undef
-        if (abp.schemas.app[appService] === undefined)
-        {
-            throw "The specified '" + capitalize(appService) + "AppService' is missing.";
-        }
-
-        // eslint-disable-next-line no-undef
+        // eslint-disable-next-line
         const base = abp.schemas.app[appService];
         let data = null;
-        if (validateAction(appService, action) == 'create')
-            data = base.create.parameters[Object.keys(base.create.parameters)[0]];
-        else if (validateAction(appService, action) == 'update')
-            data = base.update.parameters[Object.keys(base.update.parameters)[0]];
-        else if (validateAction(appService, action) == 'get')
+        if (action == 'create')
+            data = base.create.parameters.input;
+        else if (action == 'update')
+            data = base.update.parameters.input;
+        else if (action == 'get')
             data = base.get.returnValue;
-        else if (validateAction(appService, action) == 'filter')
-            data = base.getAll.parameters[Object.keys(base.getAll.parameters)[0]];
+        else if (action == 'filter')
+            data = base.getList.parameters.input;
 
         return data;
     },
@@ -70,10 +34,23 @@ export default {
          * @return {Object} JSON data
          */
     service(appService, action, data, successCallback, errorCallback, alwaysCallback) {
-
+        action = this.transformAction(action, data);
+        data = this.transformData(action, data);
         this.checkService(appService, action);
+
+        var res = null;
         // eslint-disable-next-line
-        abp.services.app[appService][action](data)
+        if (abp.services.app[appService][action] == undefined) {
+            // eslint-disable-next-line        
+            res= $.when({});        
+        } else if (action == 'update')
+            // eslint-disable-next-line
+            res = abp.services.app[appService][action](data.id, data);
+        else
+            // eslint-disable-next-line
+            res = abp.services.app[appService][action](data);
+
+        res
             .then(function (data) {
                 if (successCallback) successCallback(data);
             })
@@ -93,9 +70,20 @@ export default {
      * @return {Promise<any>} A promise (ES6 standard) of the JSON data. (cfr. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises, )
      */
     pService(appService, action, data) {
+        action = this.transformAction(action, data);
+        data = this.transformData(action, data);
         this.checkService(appService, action);
         // eslint-disable-next-line        
-        return abp.services.app[appService][action](data); // Abp returns a JQuery promise, but they adhere to the ES6 standard Promise interface (using .then and .catch) as a sort of 'downcast'
+        if (abp.services.app[appService][action] == undefined) {
+            // eslint-disable-next-line        
+            return $.when({});        
+        } else if (action == "update")
+            // eslint-disable-next-line        
+            return abp.services.app[appService][action](data.id, data);
+        else
+            // eslint-disable-next-line        
+            return abp.services.app[appService][action](data);
+        // Abp returns a JQuery promise, but they adhere to the ES6 standard Promise interface (using .then and .catch) as a sort of 'downcast'
     },
     messages(module) {
         // eslint-disable-next-line
@@ -114,12 +102,17 @@ export default {
         // eslint-disable-next-line        
         return abp.localization.languages.filter(l => {
             return !l.isDisabled;
+        }).map(l=>{
+            return {
+                name : l.cultureName,
+                displayName: l.displayName
+            }
         });
         //return abp.localization.languages;
     },
-    canActivate() {        
+    canActivate() {
         // eslint-disable-next-line
-        return !abp.auth.allPermissions.CanActivate || abp.auth.grantedPermissions.CanActivate;
+        return !abp.auth.policies.CanActivate || abp.auth.grantedPolicies.CanActivate;
     },
     settings() {
         return {
@@ -136,24 +129,39 @@ export default {
                 : null // default to null
         };
     },
-    checkService(appService, action){
+    checkService(appService, action) {
         // eslint-disable-next-line        
-        if (abp.services.app == undefined){
+        if (abp.services.app == undefined) {
             // eslint-disable-next-line        
-            console.log('%c ERROR: abp.services.app not exist', 'background: #222; color: #bada55');
+            console.log('abp.services.app not exist');
             return;
         }
         // eslint-disable-next-line        
-        if (abp.services.app[appService] == undefined){
+        if (abp.services.app[appService] == undefined) {
             // eslint-disable-next-line        
-            console.log('%c ERROR: application service '+capitalize(appService)+' not exist', 'background: #222; color: #bada55');
+            console.log('application service ' + appService + ' not exist');
             return;
         }
         // eslint-disable-next-line        
-        if (abp.services.app[appService][action] == undefined){
+        if (abp.services.app[appService][action] == undefined) {
             // eslint-disable-next-line        
-            console.log('%c ERROR: method '+capitalize(action)+' on application service '+capitalize(appService)+' not exist', 'background: #222; color: #bada55');
+            console.log('method ' + action + ' on application service ' + appService + ' not exist');
             return;
         }
+    },
+    transformAction(action, data) {
+
+        if (action == "get" && data.language)
+            return "getWithLanguage";
+        else if (action == "getAll")
+            return "getList";
+        else
+            return action;
+    },
+    transformData(action, data) {
+        if (action == "get" || action=="delete")
+            return data.id;
+        else
+            return data;
     }
 }

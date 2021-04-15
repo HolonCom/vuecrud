@@ -1,5 +1,5 @@
 <template>
-  <oa-form-layout>
+  <component :is="formLayout">
     <template #actions>
       <div v-if="actions && actions.length">
         <el-button
@@ -42,12 +42,14 @@
         :resource="resource"
       ></oa-fields>
     </el-form>
-  </oa-form-layout>
+  </component>
 </template>
 
 <script>
+import Vue from 'vue';
 import { default as Utils } from "../utils/utils";
-import defaults from '../utils/defaults'
+import defaults from '../utils/defaults';
+import FormLayout from '../../demo/FormLayout.vue';
 
 export default {
   name: "oa-form",
@@ -68,6 +70,13 @@ export default {
     return {};
   },
   computed: {
+    formLayout(){
+      var comp = Vue.component('oa-form-layout');
+      if (comp)
+        return comp;
+      else 
+        return FormLayout;
+    },
     properties() {
       return this.schema.properties;
     },
@@ -76,19 +85,21 @@ export default {
         return this.options.fields;
       } else {
         var fields = {};
-        for (var key in this.schema.properties) {
+        for (var key in this.properties) {
           if (this.columns) {
             if (this.columns.indexOf(key) > 0) {
-              fields[key] = this.schema.properties[key];
+              fields[key] = this.property(key);
             }
           } else {
             if (
               key != "id" &&
-              !this.schema.properties[key].readonly
+              !this.property(key).readonly &&
+               (!this.property(key).hasOwnProperty("x-ui-form") ||
+                        this.property(key)["x-ui-form"])
               /*&& !this.schema.properties[key]['x-rel-app']
               && !this.schema.properties[key]['x-rel-to-many-app']*/
             ) {
-              fields[key] = this.schema.properties[key];
+              fields[key] = this.property(key);
             }
           }
         }
@@ -97,8 +108,8 @@ export default {
     },
     rules() {
       var rules = {};
-      for (var key in this.schema.properties) {
-        let prop = this.schema.properties[key];
+      for (var key in this.properties) {
+        let prop = this.property(key);
         let itemRules = [];
         if (prop.required && prop.type != "object") {
           itemRules.push({
@@ -163,6 +174,9 @@ export default {
     }
   },
   methods: {
+    property(key){
+      return Utils.jsonSchema.simplify(this.properties[key]);
+    },
     validate(callback) {
       this.$refs.form.validate(function (valid) {
         if (callback) callback(valid);
