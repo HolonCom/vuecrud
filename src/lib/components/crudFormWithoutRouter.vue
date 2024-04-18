@@ -1,6 +1,7 @@
 <template>
   <oa-form
     ref="form"
+    v-loading="loading"
     :model="model"
     :schema="schema"
     :actions="actions"
@@ -9,6 +10,7 @@
     :messages="messages"
     :language="language"
     @changeLanguage="changeLanguage"
+    :readOnly="readOnly"
   ></oa-form>
 </template>
 
@@ -24,43 +26,60 @@ export default {
   data() {
     return {
       model: {},
-      actions: [
-        {
-          name: "Save",
-          type: "primary",
-          execute: () => {
-            const onSaveData = () => {
-              this.$message({
-                type: "success",
-                message: "Save completed",
-              });
-              this.redirect();
-              //this.$router.go(-1); // go back
-
-              // Refresh data
-              this.fetchData();
-            };
-
-            const onValidate = (valid) => {
-              if (valid) this.saveData(this.model).then(onSaveData);
-              else return false;
-            };
-
-            this.$refs.form.validate(onValidate);
-          },
-        },
-        {
-          name: "Cancel",
-          execute: () => {
-            this.redirect();
-            //this.$router.go(-1); // go back
-          },
-        },
-      ],
+      loading: true,
       language: "",
     };
   },
   computed: {
+      actions() {
+          if (this.readOnly) {
+              return [                  
+                  {
+                      name: "Close",
+                      type: "primary",
+                      execute: () => {
+                          this.redirect();
+                          //this.$router.go(-1); // go back
+                      },
+                  },
+              ];
+          } else {
+              return [
+                  {
+                      name: "Save",
+                      type: "primary",
+                      execute: () => {
+                          const onSaveData = () => {
+                              this.$message({
+                                  type: "success",
+                                  message: "Save completed",
+                              });
+                              this.redirect();
+                              //this.$router.go(-1); // go back
+
+                              // Refresh data
+                              this.fetchData();
+                          };
+
+                          const onValidate = (valid) => {
+                              if (valid) this.saveData(this.model).then(onSaveData);
+                              else return false;
+                          };
+
+                          this.$refs.form.validate(onValidate);
+                      },
+                  },
+                  {
+                      name: "Cancel",
+                      execute: () => {
+                          this.redirect();
+                          //this.$router.go(-1); // go back
+                      },
+                  },
+              ];
+          }
+
+      },
     // module () {
     //   return this.$route.params.module
     // },
@@ -77,7 +96,8 @@ export default {
       return !this.id;
     },
     schema() {
-      if (this.isnew) return this.connector.schema(this.resource, "create");
+      if (this.readOnly) return this.connector.schema(this.resource, "get");
+      else if (this.isnew) return this.connector.schema(this.resource, "create");
       else return this.connector.schema(this.resource, "update");
     },
     connector: function () {
@@ -92,6 +112,10 @@ export default {
     isMultiLingual() {
       return this.schema && this.schema["x-multi-language"];
     },
+    readOnly() {
+      let filterSchema = this.connector.schema(this.resource, "filter");
+      return filterSchema && filterSchema["x-ui-readonly"];
+    },
   },
   methods: {
     changeLanguage(language) {
@@ -99,10 +123,20 @@ export default {
       this.fetchData();
     },
     fetchData() {
+      this.loading = true;
       if (this.isnew) {
         this.connector
             .pService(this.resource, "init", { entityType: this.entityType })
-            .then((data) => (this.model = data));
+            .then((data) => {
+                this.model = data;
+                this.$nextTick(() => {
+                    this.$refs.form.clearValidate();
+                });
+              
+            })
+            .always(() => {
+                this.loading = false;
+            });
       } else {
         if (this.isMultiLingual) {
           this.connector
@@ -110,11 +144,21 @@ export default {
               id: this.id,
               language: this.language,
             })
-            .then((data) => (this.model = data));
+              .then((data) => {
+                  this.model = data;
+              })
+              .always(() => {
+                  this.loading = false;
+              });
         } else {
           this.connector
             .pService(this.resource, "get", { id: this.id })
-            .then((data) => (this.model = data));
+              .then((data) => {
+                  this.model = data;
+              })
+                .always(() => {
+                    this.loading = false;
+                });
         }
       }
     },
@@ -129,16 +173,34 @@ export default {
       if (this.entityType) {
         data.entityType = this.entityType;
       }
-      return this.connector.pService(this.resource, "create", data);
+      this.loading = true;
+        return this.connector.pService(this.resource, "create", data).then(() => {
+        
+        })
+        .always(() => {
+            this.loading = false;
+        });
     },
     update(data) {
+      this.loading = true;
       data.id = this.id; // TODO is this line necessary?
-      return this.connector.pService(this.resource, "update", data);
+        return this.connector.pService(this.resource, "update", data).then(() => {            
+            
+        })
+        .always(() => {
+            this.loading = false;
+        });
     },
   },
   created() {
     this.language = this.locale;
     this.fetchData();
   },
+  watch: {
+    // TODO this seems suboptimal, and won't work when using without router
+    $route: function() {
+      this.fetchData();
+    }
+  }
 };
 </script>

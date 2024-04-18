@@ -1,8 +1,9 @@
 <template>
 <div>
-    <el-table v-if="!isMobile" :data="model" @row-click="rowClick" style="width: 100%" :row-style="{cursor: 'pointer'}" @sort-change="sortChange" stripe>
+    <el-table v-if="!isMobile" :data="model" @row-click="rowClick" style="width: 100%" :row-style="{cursor: 'pointer'}" @sort-change="sortChange" @selection-change="selectionChange" stripe>
+        <el-table-column v-if="hasSelection" type="selection" width="55"></el-table-column>
         <el-table-column v-for="(value, key) in columns" :key="key" :prop="key" :label="label(key)" :width="width(key)" :formatter="formatter" class-name="crudcell" :sortable="isSortable(key)"></el-table-column>
-        <el-table-column align="right" v-if="actions && actions.length">
+        <el-table-column align="right" v-if="actions && actions.length" :width="actionsWidth">
             <template slot-scope="scope">
                 <el-button v-for="action in actions" :key="action.name" :icon="action.icon" size="small" v-show="actionVisible(action, scope.row, scope.$index)" @click="action.execute(scope.row, scope.$index)">{{action.text || ''}}</el-button>
                 <template v-if="getCustomActions">
@@ -30,12 +31,19 @@ export default {
     props: {
         model: {},
         schema: {},
+        connector: Object,
+        resource: String,
         messages: {},
         actions: {},
         defaultAction: {},
         locale: {}, // moment locale (e.g. 'fr', 'en', 'nl', ...)
         doOnSort: {},
         getCustomActions: {} // expects a callback function that will return that custom grid-row actions. in other words a GridRowActionFactory function.
+    },
+    data() {
+        return {
+            selections: []
+        };
     },
     computed: {
         properties() {
@@ -47,7 +55,7 @@ export default {
                 if (
                     key != "id" &&
                     this.property(key).type != "array" &&
-                    (!this.property(key).hasOwnProperty("x-ui-grid") ||
+                    (!Object.prototype.hasOwnProperty.call(this.property(key),"x-ui-grid") ||
                         this.property(key)["x-ui-grid"])
                 ) {
                     fields[key] = this.property(key);
@@ -57,6 +65,17 @@ export default {
         },
         isMobile() {
             return Utils.isMobile(window);
+        },
+        actionsWidth() {
+            if (this.getCustomActions && this.schema.properties['customActions'] && this.width('customActions')) {
+                return this.width('customActions');
+            } else {
+                return '';
+            }
+        },
+        hasSelection() {
+            let filterSchema = this.connector.schema(this.resource, "filter");
+            return filterSchema && filterSchema["x-ui-selection"];
         }
     },
     methods: {
@@ -126,7 +145,11 @@ export default {
             } else {
                 return true;
             }
-        }        
+        },
+        selectionChange(val) {
+            this.selections = val;
+            this.$emit('selectionChange', val)
+        }
     }
 };
 </script>

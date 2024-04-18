@@ -1,13 +1,14 @@
 <template>
   <div>
-    <el-select v-if="relationSmall" v-model="model" :value-key="relationValueField" filterable >
-      <el-option
-        v-for="item in options"
-        :key="item.value.id"
-        :label="item.label"
-        :value="item.value"
-      ></el-option>
-    </el-select>
+      <el-select v-if="relationSmall" v-model="model" :value-key="relationValueField" filterable :disabled="disabled">
+          <el-option v-if="!hideNone"
+                     :label="noneLabel"
+                     :value="noneValue"></el-option>
+          <el-option v-for="item in options"
+                     :key="item.value.id"
+                     :label="item.label"
+                     :value="item.value"></el-option>
+      </el-select>
     <el-select
       v-else
       v-model="model"
@@ -18,7 +19,9 @@
       remote
       :remote-method="remoteMethod"
       :loading="loading"
+      :disabled="disabled"
     >
+        
       <el-option
         v-for="item in options"
         :key="item.value.id"
@@ -26,7 +29,7 @@
         :value="item.value"
       ></el-option>
     </el-select>
-    <el-button v-if="relationResource" :icon="buttonIcon" v-on:click="edit"></el-button>
+    <el-button v-if="relationResource" :icon="buttonIcon" v-on:click="edit" :disabled="disabled"></el-button>
     <slot name="footer"></slot>
     <el-dialog
       v-if="relationResource"
@@ -69,7 +72,10 @@ export default {
       form: {},
       loading: false,
       dialogVisible: false,
-      options: []
+      options: [],
+      hideNone: false,
+      noneLabel: "None",
+      noneValue: undefined
     };
   },
   computed: {
@@ -104,6 +110,9 @@ export default {
     isnew() {
       return !this.value;
     },
+    disabled(){
+             return this.schema["x-ui-disabled"];
+    },
     // schema: function() {
     //    if (this.isnew)
     //        return jref.resolve(abp.schemas.app[this.resource].create.input).properties[this.prop];
@@ -115,7 +124,7 @@ export default {
         return this.value;
       },
       set(val) {
-        this.$emit("input", val);
+          this.$emit("input", val);          
       }
     },
     isMobile() {
@@ -129,8 +138,8 @@ export default {
     }
   },
   watch: {
-    value(val) {
-      if (val) {
+    value(val) {          
+      if (val && !this.relationSmall) {
         this.options = [
           {
             label: this.value[this.relationTextField],
@@ -262,18 +271,20 @@ export default {
   },
   created() {
     if (this.relationSmall) {
-      this.generateOptions(this.parentModel);
-      if (this.relationCascade) {
-        this.$watch(
-          "parentModel",
-          function(newVal) {
-            this.generateOptions(newVal);
-          },
-          {
-            deep: true
-          }
-        );
-      }
+        if (this.relationCascade) {
+            this.$watch(
+                "parentModel",
+                function (newVal) {
+                    this.generateOptions(newVal);
+                },
+                {
+                    deep: true
+                }
+            );
+        }
+        else {
+            this.generateOptions(this.parentModel);
+        }
     } else {
       if (this.value) {
         this.options = [
@@ -284,6 +295,15 @@ export default {
         ];
       }
     }
+    if (this.schema["x-rel-nonelabel"]) {
+        this.noneLabel = this.schema["x-rel-nonelabel"];
+        if (this.messages && this.messages[this.noneLabel]) {
+            this.noneLabel = this.messages[this.noneLabel];
+        }
+    }
+    if (this.schema["x-rel-hideNone"]) {
+      this.hideNone = this.schema["x-rel-hideNone"];
+    }    
   }
 };
 </script>
