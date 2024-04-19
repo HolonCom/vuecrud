@@ -122,7 +122,7 @@ export default {
           }
           itemRules.push({
             required: true,
-            message: "Please input a value",
+            message: "Please input a value"
           });
         }
       }
@@ -158,7 +158,7 @@ export default {
     isMultiLingual() {
       return this.schema && this.schema["x-multi-language"];
     },
-    labelWidthCalculated(){
+    labelWidthCalculated() {
       return defaults.labelWidth;
     }
   },
@@ -170,6 +170,9 @@ export default {
     },
     resetForm() {
       this.$refs.form.resetFields();
+    },
+    clearValidate() {
+      this.$refs.form.clearValidate();
     },
     label(name) {
       if (this.messages && this.messages[name]) {

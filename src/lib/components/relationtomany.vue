@@ -24,7 +24,7 @@ export default {
     resource: String,
     prop: String,
     label: String,
-    parentModel:{}
+    parentModel: {}
   },
   data: function() {
     return {

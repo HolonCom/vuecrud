@@ -4,6 +4,8 @@
             :module="module"
             :resource="resource"
             :connector="connector"
+            :entityType="entityType"
+            :doOnView="onView"
             :doOnEdit="onEdit"
             :doOnAdd="onAdd"
         ></oa-crud-grid-without-router>
@@ -25,9 +27,21 @@ export default {
         },
         connector() {
             return this.$root.$options.connector;
+        },
+        entityType() {
+            return this.$root.$options.entityType;
         }
     },
     methods: {
+        onView(row) {
+            this.$router.push({
+                name: "view",
+                params: {
+                    resource: this.resource,
+                    id: row.id
+                }
+            });
+        },
         onEdit(row) {
             this.$router.push({
                 name: "edit",

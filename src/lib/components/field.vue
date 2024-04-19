@@ -1,5 +1,11 @@
 <template>
     <el-form-item :label="label" :prop="prop" :label-width="labelWidth">
+        <span slot="label">
+            {{label}}
+            <el-tooltip v-if="tooltip" :content="tooltip" >                
+                <i class="el-icon-info"></i>
+            </el-tooltip>
+        </span>
         <component v-bind:is="currentView" v-model="model" :model="value" v-bind="$props" @propChange="propChange" :resource="resource" :parent-model="parentModel"></component>
     </el-form-item>
 </template>
@@ -30,7 +36,8 @@ export default {
         },
         connector: {},
         resource: String,
-        parentModel:{}
+        parentModel: {},
+        readOnly: Boolean
     },
 
     computed: {
@@ -58,7 +65,28 @@ export default {
                         });
                     };    
                 }
-                return comp;        
+                return comp;
+            } else if (this.readOnly) {
+                comp = 
+                    sch.enum
+                    ? components.ViewEnum // (type == "array" ? components.ViewEnumArray : components.ViewEnum)
+                    : type == "boolean"
+                        ? components.ViewBoolean
+                    //: type == "integer" || type == "number"
+                    //    ? components.ViewNumber
+                    //: type == "array" && this.schema.items.format == "date-time"
+                    //    ? components.Daterange
+                    //: sch.format == "date-time"
+                    //    ? components.ViewDatetime
+                    //: sch["x-ui-multiline"]
+                    //    ? components.ViewTextarea
+                    : type == "array"
+                        ? components.List
+                    : type == "object"
+                        ? components.Fields
+                        : components.ViewText; 
+
+                return comp;
             } else {
                 comp = 
                     sch["x-rel-action"]
@@ -139,7 +167,6 @@ export default {
 
            
         },
-
         model: {
             get() {
                 return this.value;
@@ -158,11 +185,20 @@ export default {
                 return this.messages[name];
             else return this.schema.title ? this.schema.title : name;
         },
+        tooltip() {
+            if (this.hideLabel) return "";            
+            if (this.messages && this.messages[this.schema.description])
+                return this.messages[this.schema.description];
+            else return this.schema.description;
+        },
         hideLabel() {
             return this.schema["x-ui-hideLabel"];
         },
+        lw() {
+            return this.schema["x-ui-labelWidth"];
+        },
         labelWidth: function() {
-            return this.hideLabel ? "0px" : defaults.labelWidth;
+            return this.hideLabel ? "0px" : (this.lw ? this.lw : defaults.labelWidth);
         }
     },
     methods: {

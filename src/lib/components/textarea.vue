@@ -1,5 +1,5 @@
 <template>
-    <el-input type="textarea" autosize v-model="model"></el-input>
+    <el-input type="textarea" v-model="model" :disabled="disabled" :autosize="{ minRows: 2, maxRows: 5}" ></el-input>
 </template>
 
 <script>
@@ -20,6 +20,9 @@ export default {
             set(val) {
                 this.$emit("input", val);
             }
+        },
+        disabled(){
+             return this.schema["x-ui-disabled"];
         }
     }
 };

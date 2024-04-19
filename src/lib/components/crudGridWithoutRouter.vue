@@ -7,8 +7,7 @@
         :icon="action.icon"
         size="small"
         :type="action.type"
-        @click="action.execute()"
-      >{{action.name}}</el-button>
+        @click="action.execute()">{{action.name}}</el-button>
     </template>
     <template #batchactions>
       <el-button
@@ -30,8 +29,8 @@
           :actions="filterActions"
           :messages="messages"
           :resource="resource"
-          @filterEager="filterEager"
-        ></oa-advfilter-form>
+          @filterEager="filterEager">
+	</oa-advfilter-form>
       </div>
       <div v-else-if="hasFilter">
         <oa-filter-form
@@ -42,8 +41,8 @@
           :actions="filterActions"
           :messages="messages"
           :resource="resource"
-          @filterEager="filterEager"
-        ></oa-filter-form>
+          @filterEager="filterEager">
+	  </oa-filter-form>
       </div>
     </template>
     <div class="oa-crud-grid">      
@@ -55,8 +54,8 @@
         :default-action="gridActions[0]"
         :locale="locale"
         :doOnSort="doOnSort"
-        :getCustomActions="getCustomActions"
-      ></oa-grid>
+        :getCustomActions="getCustomActions">
+      </oa-grid>
       <br />
       <div style="float:right;margin-bottom:10px;">
         <el-pagination
@@ -64,12 +63,10 @@
           :current-page.sync="currentPage"
           :page-size="pageSize"
           layout="total, prev, pager, next"
-          :total="totalCount"
-        ></el-pagination>
+          :total="totalCount">
+        </el-pagination>
       </div>
-      <div
-        style="float:right;margin-bottom:10px;width: 80px; margin-left: 20px; margin-right: 20px;"
-      >
+      <div style="float:right;margin-bottom:10px;width: 80px; margin-left: 20px; margin-right: 20px;">
         <el-select :value="pageSize" @input="onChangePageSize" placeholder="Select" size="mini">
           <el-option v-for="item in pageSizeOptions" :key="item" :label="item" :value="item"></el-option>
         </el-select>
