@@ -31,8 +31,6 @@ export default {
     props: {
         model: {},
         schema: {},
-        connector: Object,
-        resource: String,
         messages: {},
         actions: {},
         defaultAction: {},
