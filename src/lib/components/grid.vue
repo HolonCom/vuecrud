@@ -72,8 +72,10 @@ export default {
             }
         },
         hasSelection() {
-            let filterSchema = this.connector.schema(this.resource, "filter");
-            return filterSchema && filterSchema["x-ui-selection"];
+            return false;
+            // do not support this for now, as it has dependancy on connector
+            // let filterSchema = this.connector.schema(this.resource, "filter");
+            // return filterSchema && filterSchema["x-ui-selection"];
         }
     },
     methods: {
