@@ -1,11 +1,14 @@
 <template>
 <div>
-    <el-table v-if="!isMobile" :data="model" @row-click="rowClick" style="width: 100%" :row-style="{cursor: 'pointer'}" @sort-change="sortChange" stripe>
+    <el-table v-if="!isMobile" :data="model" @row-click="rowClick" style="width: 100%" :row-style="{cursor: 'pointer'}" @sort-change="sortChange" @selection-change="selectionChange" stripe>
+        <el-table-column v-if="hasSelection" type="selection" width="55"></el-table-column>
         <el-table-column v-for="(value, key) in columns" :key="key" :prop="key" :label="label(key)" :width="width(key)" :formatter="formatter" class-name="crudcell" :sortable="isSortable(key)"></el-table-column>
-        <el-table-column align="right" v-if="actions && actions.length">
+        <el-table-column align="right" v-if="actions && actions.length" :width="actionsWidth">
             <template slot-scope="scope">
                 <el-button v-for="action in actions" :key="action.name" :icon="action.icon" size="small" v-show="actionVisible(action, scope.row, scope.$index)" @click="action.execute(scope.row, scope.$index)">{{action.text || ''}}</el-button>
+                <template v-if="getCustomActions">
                 <component v-for="(comp, index) in getCustomActions(scope.row, scope.$index)" :key="index" :is="comp" v-bind="scope.row" ></component>
+                </template>
             </template>
         </el-table-column>
     </el-table>
@@ -28,6 +31,8 @@ export default {
     props: {
         model: {},
         schema: {},
+        connector: Object,
+        resource: String,
         messages: {},
         actions: {},
         defaultAction: {},
@@ -35,36 +40,58 @@ export default {
         doOnSort: {},
         getCustomActions: {} // expects a callback function that will return that custom grid-row actions. in other words a GridRowActionFactory function.
     },
+    data() {
+        return {
+            selections: []
+        };
+    },
     computed: {
+        properties() {
+            return Utils.jsonSchema.simplify(this.schema).properties;
+        },
         columns() {
             var fields = {};
-            for (var key in this.schema.properties) {
+            for (var key in this.properties) {
                 if (
                     key != "id" &&
-                    this.schema.properties[key].type != "array" &&
-                    (!this.schema.properties[key].hasOwnProperty("x-ui-grid") ||
-                        this.schema.properties[key]["x-ui-grid"])
+                    this.property(key).type != "array" &&
+                    (!Object.prototype.hasOwnProperty.call(this.property(key),"x-ui-grid") ||
+                        this.property(key)["x-ui-grid"])
                 ) {
-                    fields[key] = this.schema.properties[key];
+                    fields[key] = this.property(key);
                 }
             }
             return fields;
         },
         isMobile() {
             return Utils.isMobile(window);
+        },
+        actionsWidth() {
+            if (this.getCustomActions && this.schema.properties['customActions'] && this.width('customActions')) {
+                return this.width('customActions');
+            } else {
+                return '';
+            }
+        },
+        hasSelection() {
+            let filterSchema = this.connector.schema(this.resource, "filter");
+            return filterSchema && filterSchema["x-ui-selection"];
         }
     },
     methods: {
+        property(key){
+            return Utils.jsonSchema.simplify(this.properties[key]);
+        },
         isSortable(prop) {
-            const sortable = this.schema.properties[prop]["x-ui-grid-sortable"];
+            const sortable = this.property(prop)["x-ui-grid-sortable"];
             return sortable === undefined ? false : "custom";
         },
         sortChange({ column, prop, order }){
             if (this.doOnSort) this.doOnSort({ column, prop, order });
         },
         label(prop) {
-            var name = this.schema.properties[prop].title
-                ? this.schema.properties[prop].title
+            var name = this.property(prop).title
+                ? this.property(prop).title
                 : Utils.capitalize(prop);
             if (this.messages && this.messages[name]) {
                 return this.messages[name];
@@ -73,14 +100,14 @@ export default {
             }
         },
         width(prop) {
-            return this.schema.properties[prop]['x-ui-width'] || '';            
+            return this.property(prop)['x-ui-width'] || '';            
         },
         formatter(row, column, cellValue) {
             return this.format(column.property, cellValue);
         },
         format(property, cellValue) {
             const schema = Utils.jsonSchema.getNotNull(
-                this.schema.properties[property]
+                this.property(property)
             );
             if (schema.type == "boolean") {
                 return cellValue ? this.messages["Yes"] : this.messages["No"];
@@ -118,6 +145,10 @@ export default {
             } else {
                 return true;
             }
+        },
+        selectionChange(val) {
+            this.selections = val;
+            this.$emit('selectionChange', val)
         }
     }
 };

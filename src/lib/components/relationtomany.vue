@@ -1,14 +1,69 @@
 <template>
-<div>
-    <el-select multiple @input="updateModel" :value="model" :value-key="relationValueField" filterable clearable v-on:clear="clear" remote :remote-method="remoteMethod" :loading="loading">
-        <el-option v-for="item in computedOptions" :key="item.value.id" :label="item.label" :value="item.value"></el-option>
+  <div>
+    <el-select
+      v-if="relationSmall"
+      multiple
+      @input="updateModel"
+      :value="model"
+      :value-key="relationValueField"
+      filterable
+      :disabled="disabled"
+    >
+      <el-option
+        v-for="item in computedOptions"
+        :key="item.value.id"
+        :label="item.label"
+        :value="item.value"
+      ></el-option>
     </el-select>
-    <el-button v-if="relationResource" :icon="buttonIcon" v-on:click="edit"></el-button>
+    <el-select
+      v-else
+      multiple
+      @input="updateModel"
+      :value="model"
+      :value-key="relationValueField"
+      filterable
+      clearable
+      v-on:clear="clear"
+      remote
+      :remote-method="remoteMethod"
+      :loading="loading"
+      :disabled="disabled"
+    >
+      <el-option
+        v-for="item in computedOptions"
+        :key="item.value.id"
+        :label="item.label"
+        :value="item.value"
+      ></el-option>
+    </el-select>
+    <el-button
+      v-if="relationResource"
+      :icon="buttonIcon"
+      v-on:click="edit"
+      :disabled="disabled"
+    ></el-button>
     <slot name="footer"></slot>
-    <el-dialog v-if="relationResource" ref="customerDialog" title="Client" :visible.sync="dialogVisible" :fullscreen="fullscreen" :before-close="handleClose" :append-to-body="true" @open="openDialog" @close="closeDialog">
-        <oa-dialog-form ref="form" :resource="relationResource" :connector="connector" v-model="model" v-on:close="close"></oa-dialog-form>
+    <el-dialog
+      v-if="relationResource"
+      ref="customerDialog"
+      title="Client"
+      :visible.sync="dialogVisible"
+      :fullscreen="fullscreen"
+      :before-close="handleClose"
+      :append-to-body="true"
+      @open="openDialog"
+      @close="closeDialog"
+    >
+      <oa-dialog-form
+        ref="form"
+        :resource="relationResource"
+        :connector="connector"
+        v-model="model"
+        v-on:close="close"
+      ></oa-dialog-form>
     </el-dialog>
-</div>
+  </div>
 </template>
 
 <script>
@@ -26,12 +81,12 @@ export default {
     label: String,
     parentModel: {}
   },
-  data: function() {
+  data: function () {
     return {
       form: {},
       loading: false,
       dialogVisible: false,
-      options: null
+      options: null,
     };
   },
   computed: {
@@ -52,6 +107,9 @@ export default {
     },
     relationCascade() {
       return this.schema["x-rel-to-many-cascade"];
+    },
+    relationSmall() {
+      return this.schema["x-rel-to-many-small"];
     },
     id() {
       return this.value ? this.value[this.relationValueField] : null;
@@ -87,7 +145,7 @@ export default {
 
       if (this.value) {
         baseOptions = this.value.map(
-          function(t) {
+          function (t) {
             return {
               label: t[this.relationTextField],
               value: t
@@ -99,9 +157,9 @@ export default {
         var retval = baseOptions.concat(this.options);
         // Remove duplicates
         retval = retval.filter(
-          function(item, index, arr) {
+          function (item, index, arr) {
             var firstIndex = arr.findIndex(
-              function(element) {
+              function (element) {
                 return (
                   element.value[this.relationValueField] ==
                   item.value[this.relationValueField]
@@ -116,18 +174,21 @@ export default {
 
       if (baseOptions.length <= 0) return null;
       return baseOptions;
-    }
+    },
+    disabled() {
+      return this.schema["x-ui-disabled"];
+    },
   },
   methods: {
     remoteMethod(query) {
-      const itemToOption = item => ({
+      const itemToOption = (item) => ({
         label: item[this.relationTextField],
-        value: item
+        value: item,
       });
 
-      const onSuccess = data => {
-        let items = data.items || data;        
-        this.options = items.map(itemToOption);        
+      const onSuccess = (data) => {
+        let items = data.items || data;
+        this.options = items.map(itemToOption);
         this.loading = false;
       };
 
@@ -140,17 +201,17 @@ export default {
       ) {
         this.loading = true;
         if (this.relationCascade) {
-            let req = {
-                query: query
-            };
-            req= Object.assign(req, this.parentModel.model);
-            this.connector
-                .pService(
-                this.relationResource ? this.relationResource : this.resource,
-                this.relationAction,
-                req
-                )
-                .then(onSuccess);
+          let req = {
+            query: query
+          };
+          req = Object.assign(req, this.parentModel.model);
+          this.connector
+            .pService(
+              this.relationResource ? this.relationResource : this.resource,
+              this.relationAction,
+              req
+            )
+            .then(onSuccess);
         } else {
           this.connector
             .pService(
@@ -162,6 +223,32 @@ export default {
         }
       } else if (query == "") {
         this.options = null;
+      }
+    },
+    generateOptions(newParentModel) {
+      let req = {};
+      if (newParentModel && newParentModel.model) {
+        req = Object.assign(req, this.parentModel.model);
+        if (this.parentModel.model) {
+          req.parent = this.parentModel.parent;
+        }
+      }
+      if (this.relationAction) {
+        this.connector.service(
+          this.resource,
+          this.relationAction,
+          req,
+          (data) => {
+            let items = data.items || data;
+            this.options = items.map((t) => {
+              return {
+                label: t[this.relationTextField],
+                value: t,
+              };
+            });
+          },
+          () => {}
+        );
       }
     },
     clear() {
@@ -193,6 +280,25 @@ export default {
       if (this.fullscreen) {
         document.body.classList.remove("dialog-open");
       }
+    }
+  },
+  created() {
+    if (this.relationSmall) {
+      
+        if (this.relationCascade) {
+            this.$watch(
+                "parentModel",
+                function (newVal) {
+                    this.generateOptions(newVal);
+                },
+                {
+                    deep: true
+                }
+            );
+        } else {
+            this.generateOptions(this.parentModel);
+        }
+
     }
   }
 };

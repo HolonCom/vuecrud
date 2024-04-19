@@ -1,6 +1,6 @@
 {
     "name": "vuecrud",
-    "version": "0.2.148",
+    "version": "0.2.198",
     "private": true,
     "main": "dist/vuecrud.umd.js",
     "scripts": {
@@ -18,10 +18,9 @@
         "vue-router": "3.6.5"
     },
     "devDependencies": {
-        "@vue/cli-plugin-babel": "3.12.0",
-        "@vue/cli-plugin-eslint": "3.0.0",
-        "@vue/cli-service": "3.12.0",
-        "@vue/eslint-config-standard": "3.0.0",
+        "@vue/cli-plugin-eslint": "3.12.1",
+        "@vue/cli-service": "3.12.1",
+        "@vue/eslint-config-standard": "3.0.5",
         "@vue/runtime-dom": "3.4.23",
         "vue-template-compiler": "2.6.14",
         "webpack-auto-inject-version": "1.1.0"
