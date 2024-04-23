@@ -207,7 +207,7 @@ export default {
     },
     labelWidthCalculated() {
       return defaults.labelWidth;
-    },
+    }
   },
   methods: {
     property(key) {
