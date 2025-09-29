@@ -26,8 +26,7 @@
                                    :actions="filterActions"
                                    :messages="messages"
                                    :resource="resource"
-                                   @filterEager="filterEager">
-		</oa-advfilter-form>
+                                   @filterEager="filterEager"></oa-advfilter-form>
             </div>
             <div v-else-if="hasFilter">
                 <oa-filter-form ref="filterform"
@@ -37,8 +36,7 @@
                                 :actions="filterActions"
                                 :messages="messages"
                                 :resource="resource"
-                                @filterEager="filterEager">
-		</oa-filter-form>
+                                @filterEager="filterEager"></oa-filter-form>
             </div>
         </template>
         <div class="oa-crud-grid">
@@ -52,16 +50,14 @@
                      :locale="locale"
                      :doOnSort="doOnSort"
                      :getCustomActions="getCustomActions"
-                     @selectionChange="selectionChange">
-	    </oa-grid>
+                     @selectionChange="selectionChange"></oa-grid>
             <br />
             <div style="float:right;margin-bottom:10px;">
                 <el-pagination @current-change="currentPageChange"
                                :current-page.sync="currentPage"
                                :page-size="pageSize"
                                layout="total, prev, pager, next"
-                               :total="totalCount">
-		</el-pagination>
+                               :total="totalCount"></el-pagination>
             </div>
             <div style="float:right;margin-bottom:10px;width: 80px; margin-left: 20px; margin-right: 20px;">
                 <el-select :value="pageSize" @input="onChangePageSize" placeholder="Select" size="mini">

@@ -174,9 +174,7 @@ export default {
         data.entityType = this.entityType;
       }
       this.loading = true;
-      return this.connector
-        .pService(this.resource, "create", data)
-        .then(() => { })
+      return this.connector.pService(this.resource, "create", data).then(() => { })
         .always(() => {
           this.loading = false;
         });
@@ -184,9 +182,7 @@ export default {
     update(data) {
       this.loading = true;
       data.id = this.id; // TODO is this line necessary?
-      return this.connector
-        .pService(this.resource, "update", data)
-        .then(() => { })
+      return this.connector.pService(this.resource, "update", data).then(() => { })
         .always(() => {
           this.loading = false;
         });
