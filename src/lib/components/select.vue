@@ -59,6 +59,9 @@ export default {
     disabled() {
       return this.sch["x-ui-disabled"];
     },
+    relationResource() {
+      return this.sch["x-enum-app"];
+    },   
     sch(){
       return Utils.jsonSchema.getNotNull(this.schema);
     }
@@ -84,7 +87,7 @@ export default {
         var enumValueField = this.sch["x-enum-valuefield"] || "id";
         var enumTextField = this.sch["x-enum-textfield"] || "fullName";
         this.connector.service(
-          this.getResource(),
+          this.relationResource ? this.relationResource : this.resource,
           enumAction,
           req,
           (data) => {
@@ -97,12 +100,6 @@ export default {
         );
       }
     },
-    getResource() {
-      return this.relationResource && this.relationResource() ? this.relationResource() : this.resource
-    },
-    relationResource() {
-      return this.sch["x-enum-app"];
-    },    
   },
   created() {
     // const sch =
