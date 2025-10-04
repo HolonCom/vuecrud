@@ -39,7 +39,7 @@ export default {
                 : this.schema;
         },        
         relationResource() {
-            return this.sch["x-enum-app"];
+            return this.schema["x-enum-app"];
         },
     },
     created() {
@@ -61,7 +61,7 @@ export default {
             var enumValueField = this.schema["x-enum-valuefield"] || "id";
             var enumTextField = this.schema["x-enum-textfield"] || "fullName";
             this.connector.service(
-                this.relationResource ? this.relationResource : this.resource,
+                this.relationResource() ? this.relationResource() : this.resource,
                 enumAction,
                 {},
                 data => {
