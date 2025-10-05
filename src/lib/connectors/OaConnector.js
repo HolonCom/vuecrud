@@ -1,3 +1,4 @@
+/* global abp */
 function capitalize(text) {
     return text.charAt(0).toUpperCase() + text.slice(1);
 }
@@ -149,19 +150,19 @@ export default {
         // eslint-disable-next-line        
         if (abp.services.app == undefined){
             // eslint-disable-next-line        
-            console.error('%c ERROR: abp.services.app not exist');
+            console.log('%c ERROR: abp.services.app not exist', 'background: #222; color: #bada55');
             return;
         }
         // eslint-disable-next-line        
         if (abp.services.app[appService] == undefined){
             // eslint-disable-next-line        
-            console.error('%c ERROR: application service '+capitalize(appService)+' not exist');
+            console.log('%c ERROR: application service '+capitalize(appService)+' not exist', 'background: #222; color: #bada55');
             return;
         }
         // eslint-disable-next-line        
         if (abp.services.app[appService][action] == undefined){
             // eslint-disable-next-line        
-            console.error('%c ERROR: method '+capitalize(action)+' on application service '+capitalize(appService)+' not exist');
+            console.log('%c ERROR: method '+capitalize(action)+' on application service '+capitalize(appService)+' not exist', 'background: #222; color: #bada55');
             return;
         }
     }
