@@ -43,6 +43,7 @@ This library builds forms, lists, and relational selections based on JSON schema
 - `x-ui-hideLabel` hides labels at field level; `field.vue` and `viewtext.vue` use this to create minimalist UIs.
 - `x-ui-labelWidth` overrides the default label width per field, useful for longer descriptions or compact columns.
 - `x-ui-width` determines the column width in grids (`grid.vue`), so tables align consistently without inline styles.
+- `x-ui-placeholder` sets placeholder text for input fields; `input.vue` and `textarea.vue` display this text until the user starts typing.
 
 ### Enumerations and selections
 - `x-enum-action` and `x-enum-app` define where enum data comes from; `select.vue` and `checkboxGroup.vue` call the appropriate backend action via the connector.

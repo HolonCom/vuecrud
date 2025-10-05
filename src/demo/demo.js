@@ -450,12 +450,14 @@ abp.schemas.app.user.create.parameters = {
                 "maxLength": 32,
                 "minLength": 0,
                 "x-ui-grid-sortable": true,
-                "x-ui-card": 'User'
+                "x-ui-card": 'User',
+                "x-ui-placeholder": "Enter your username"
             },
             "name": {
                 "type": "string",
                 "maxLength": 32,
-                "minLength": 0
+                "minLength": 0,
+                "x-ui-placeholder": "Your first name"
             },
             "surname": {
                 "type": "string",
@@ -469,7 +471,8 @@ abp.schemas.app.user.create.parameters = {
                 "maxLength": 256,
                 "minLength": 0,
                 "x-ui-dependency-field": 'isActive',
-                "x-ui-dependency-value": true
+                "x-ui-dependency-value": true,
+                "x-ui-placeholder": "example@email.com"
 
             },
             "isActive": {
