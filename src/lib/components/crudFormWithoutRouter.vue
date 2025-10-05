@@ -129,13 +129,15 @@ export default {
           .pService(this.resource, "init", { entityType: this.entityType })
           .then((data) => {
             this.model = data;
-            this.$nextTick(() => {
-              this.$refs.form.clearValidate();
-            });
-
           })
           .always(() => {
             this.loading = false;
+            // Move clearValidate to mounted lifecycle via nextTick, to fix the issue of clearValidate not being called when the form is created.
+            this.$nextTick(() => {
+              if (this.$refs.form) {
+                this.$refs.form.clearValidate();
+              }
+            });
           });
       } else {
         if (this.isMultiLingual) {
